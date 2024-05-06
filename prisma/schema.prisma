@@ -8,16 +8,16 @@ datasource db {
 }
 
 model client {
-  id            String    @id @db.Char(36)
-  first_name    String?   @db.VarChar(255)
-  last_name     String?   @db.VarChar(255)
-  address_line1 String?   @db.VarChar(255)
-  address_line2 String?   @db.VarChar(255)
-  postal_code   String?   @db.VarChar(255)
-  city          String?   @db.VarChar(255)
-  phone_number  String?   @db.VarChar(255)
-  email         String?   @db.VarChar(255)
-  company_id    String?   @db.Char(36)
+  id            String    @id @default(uuid())
+  first_name    String
+  last_name     String
+  address_line1 String
+  address_line2 String?
+  postal_code   String
+  city          String
+  phone_number  String
+  email         String
+  company_id    String
   company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "client_ibfk_1")
   invoice       invoice[]
 
@@ -25,20 +25,20 @@ model client {
 }
 
 model company {
-  id                     String     @id @db.Char(36)
-  name                   String?    @db.VarChar(255)
-  address_line1          String?    @db.VarChar(255)
-  address_line2          String?    @db.VarChar(255)
-  postal_code            String?    @db.VarChar(255)
-  city                   String?    @db.VarChar(255)
+  id                     String     @id @default(uuid())
+  name                   String
+  address_line1          String
+  address_line2          String?
+  postal_code            String
+  city                   String
   creation_date          DateTime?  @default(now()) @db.DateTime(0)
-  tax_identifier         String?    @db.VarChar(255)
-  capital                Float?     @db.Float
-  number_of_employees    Int?
-  responsible_first_name String?    @db.VarChar(255)
-  responsible_last_name  String?    @db.VarChar(255)
-  phone_number           String?    @db.VarChar(255)
-  email                  String?    @unique(map: "email")
+  tax_identifier         String?
+  capital                Float?
+  number_of_employees    Int
+  responsible_first_name String
+  responsible_last_name  String
+  phone_number           String
+  email                  String     @unique(map: "email")
   client                 client[]
   invoice                invoice[]
   product                product[]
@@ -48,15 +48,15 @@ model company {
 }
 
 model invoice {
-  id           String         @id @db.Char(36)
+  id           String         @id @default(uuid())
   created_at   DateTime?      @default(now()) @db.DateTime(0)
   due_date     DateTime?      @db.DateTime(0)
-  amount       Float?         @db.Float
+  amount       Float?
   is_paid      Boolean?
-  notes        String?        @db.VarChar(255)
-  company_id   String?        @db.Char(36)
-  client_id    String?        @db.Char(36)
-  product_id   String?        @db.Char(36)
+  notes        String?
+  company_id   String?
+  client_id    String?
+  product_id   String?
   company      company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_1")
   client       client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_2")
   product      product?       @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_3")
@@ -68,12 +68,12 @@ model invoice {
 }
 
 model invoice_item {
-  id          String   @id @db.Char(36)
-  description String?  @db.VarChar(255)
+  id          String   @id @default(uuid())
+  description String?
   quantity    Int?
-  unit_price  Float?   @db.Float
-  invoice_id  String?  @db.Char(36)
-  product_id  String?  @db.Char(36)
+  unit_price  Float?
+  invoice_id  String?
+  product_id  String?
   invoice     invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_1")
   product     product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_2")
 
@@ -82,16 +82,16 @@ model invoice_item {
 }
 
 model product {
-  id             String         @id @db.Char(36)
-  name           String?        @db.VarChar(255)
-  purchase_price Float?         @db.Float
-  sale_price     Float?         @db.Float
-  margin_rate    Float?         @db.Float
-  dimensions     String?        @db.VarChar(255)
-  size           String?        @db.VarChar(255)
-  description    String?        @db.VarChar(255)
-  company_id     String?        @db.Char(36)
-  supplier_id    String?        @db.Char(36)
+  id             String         @id @default(uuid())
+  name           String?
+  purchase_price Float?
+  sale_price     Float?
+  margin_rate    Float?
+  dimensions     String?
+  size           String?
+  description    String?
+  company_id     String?
+  supplier_id    String?
   invoice        invoice[]
   invoice_item   invoice_item[]
   company        company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_1")
@@ -103,10 +103,10 @@ model product {
 }
 
 model stock {
-  id         String   @id @db.Char(36)
+  id         String   @id @default(uuid())
   quantity   Int?
-  product_id String?  @db.Char(36)
-  company_id String?  @db.Char(36)
+  product_id String?
+  company_id String?
   product    product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_1")
   company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_2")
 
@@ -115,16 +115,16 @@ model stock {
 }
 
 model supplier {
-  id            String    @id @db.Char(36)
-  first_name    String?   @db.VarChar(255)
-  last_name     String?   @db.VarChar(255)
-  address_line1 String?   @db.VarChar(255)
-  address_line2 String?   @db.VarChar(255)
-  postal_code   String?   @db.VarChar(255)
-  city          String?   @db.VarChar(255)
-  phone_number  String?   @db.VarChar(255)
-  email         String?   @db.VarChar(255)
-  company_id    String?   @db.Char(36)
+  id            String    @id @default(uuid())
+  first_name    String?
+  last_name     String?
+  address_line1 String?
+  address_line2 String?
+  postal_code   String?
+  city          String?
+  phone_number  String?
+  email         String?
+  company_id    String?
   product       product[]
   company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "supplier_ibfk_1")
 
@@ -132,14 +132,14 @@ model supplier {
 }
 
 model user {
-  id         String   @id @db.Char(36)
-  first_name String?  @db.VarChar(255)
-  last_name  String?  @db.VarChar(255)
-  username   String?  @unique(map: "username") @db.VarChar(255)
-  password   String?  @db.VarChar(255)
-  email      String?  @unique(map: "email") @db.VarChar(255)
-  role       String?  @db.VarChar(255)
-  company_id String?  @db.Char(36)
+  id         String   @id @default(uuid())
+  first_name String
+  last_name  String
+  username   String   @unique(map: "username")
+  password   String
+  email      String   @unique(map: "email")
+  role       String
+  company_id String?
   company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
 
   @@index([company_id], map: "company_id")
