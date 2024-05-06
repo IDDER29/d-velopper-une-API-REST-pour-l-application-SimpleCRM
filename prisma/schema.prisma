@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id            String    @id @db.Char(36)
+  first_name    String?   @db.VarChar(255)
+  last_name     String?   @db.VarChar(255)
+  address_line1 String?   @db.VarChar(255)
+  address_line2 String?   @db.VarChar(255)
+  postal_code   String?   @db.VarChar(255)
+  city          String?   @db.VarChar(255)
+  phone_number  String?   @db.VarChar(255)
+  email         String?   @db.VarChar(255)
+  company_id    String?   @db.Char(36)
+  company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "client_ibfk_1")
+  invoice       invoice[]
+
+  @@index([company_id], map: "company_id")
+}
+
+model company {
+  id                     String     @id @db.Char(36)
+  name                   String?    @db.VarChar(255)
+  address_line1          String?    @db.VarChar(255)
+  address_line2          String?    @db.VarChar(255)
+  postal_code            String?    @db.VarChar(255)
+  city                   String?    @db.VarChar(255)
+  creation_date          DateTime?  @default(now()) @db.DateTime(0)
+  tax_identifier         String?    @db.VarChar(255)
+  capital                Float?     @db.Float
+  number_of_employees    Int?
+  responsible_first_name String?    @db.VarChar(255)
+  responsible_last_name  String?    @db.VarChar(255)
+  phone_number           String?    @db.VarChar(255)
+  email                  String?    @unique(map: "email")
+  client                 client[]
+  invoice                invoice[]
+  product                product[]
+  stock                  stock[]
+  supplier               supplier[]
+  user                   user[]
+}
+
+model invoice {
+  id           String         @id @db.Char(36)
+  created_at   DateTime?      @default(now()) @db.DateTime(0)
+  due_date     DateTime?      @db.DateTime(0)
+  amount       Float?         @db.Float
+  is_paid      Boolean?
+  notes        String?        @db.VarChar(255)
+  company_id   String?        @db.Char(36)
+  client_id    String?        @db.Char(36)
+  product_id   String?        @db.Char(36)
+  company      company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_1")
+  client       client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_2")
+  product      product?       @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_3")
+  invoice_item invoice_item[]
+
+  @@index([client_id], map: "client_id")
+  @@index([company_id], map: "company_id")
+  @@index([product_id], map: "product_id")
+}
+
+model invoice_item {
+  id          String   @id @db.Char(36)
+  description String?  @db.VarChar(255)
+  quantity    Int?
+  unit_price  Float?   @db.Float
+  invoice_id  String?  @db.Char(36)
+  product_id  String?  @db.Char(36)
+  invoice     invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_1")
+  product     product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_2")
+
+  @@index([invoice_id], map: "invoice_id")
+  @@index([product_id], map: "product_id")
+}
+
+model product {
+  id             String         @id @db.Char(36)
+  name           String?        @db.VarChar(255)
+  purchase_price Float?         @db.Float
+  sale_price     Float?         @db.Float
+  margin_rate    Float?         @db.Float
+  dimensions     String?        @db.VarChar(255)
+  size           String?        @db.VarChar(255)
+  description    String?        @db.VarChar(255)
+  company_id     String?        @db.Char(36)
+  supplier_id    String?        @db.Char(36)
+  invoice        invoice[]
+  invoice_item   invoice_item[]
+  company        company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_1")
+  supplier       supplier?      @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_2")
+  stock          stock[]
+
+  @@index([company_id], map: "company_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+model stock {
+  id         String   @id @db.Char(36)
+  quantity   Int?
+  product_id String?  @db.Char(36)
+  company_id String?  @db.Char(36)
+  product    product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_1")
+  company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_2")
+
+  @@index([company_id], map: "company_id")
+  @@index([product_id], map: "product_id")
+}
+
+model supplier {
+  id            String    @id @db.Char(36)
+  first_name    String?   @db.VarChar(255)
+  last_name     String?   @db.VarChar(255)
+  address_line1 String?   @db.VarChar(255)
+  address_line2 String?   @db.VarChar(255)
+  postal_code   String?   @db.VarChar(255)
+  city          String?   @db.VarChar(255)
+  phone_number  String?   @db.VarChar(255)
+  email         String?   @db.VarChar(255)
+  company_id    String?   @db.Char(36)
+  product       product[]
+  company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "supplier_ibfk_1")
+
+  @@index([company_id], map: "company_id")
+}
+
+model user {
+  id         String   @id @db.Char(36)
+  first_name String?  @db.VarChar(255)
+  last_name  String?  @db.VarChar(255)
+  username   String?  @unique(map: "username") @db.VarChar(255)
+  password   String?  @db.VarChar(255)
+  email      String?  @unique(map: "email") @db.VarChar(255)
+  role       String?  @db.VarChar(255)
+  company_id String?  @db.Char(36)
+  company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
+
+  @@index([company_id], map: "company_id")
+}
