@@ -8,139 +8,95 @@ datasource db {
 }
 
 model client {
-  id            String    @id @default(uuid())
-  first_name    String
-  last_name     String
-  address_line1 String
-  address_line2 String?
-  postal_code   String
-  city          String
-  phone_number  String
-  email         String
-  company_id    String
-  company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "client_ibfk_1")
-  invoice       invoice[]
+  id_client                 String    @id @unique(map: "id_client") @default(uuid())
+  first_name_client         String
+  last_name_client          String
+  address_line1_client      String
+  address_line2_client      String?
+  postal_code_client_client String
+  city_client               String
+  phone_number_client       String
+  email_client              String    @unique(map: "email_client")
+  company_id_client         String
+  company_client            company?  @relation(fields: [company_id_client], references: [id_company], onDelete: NoAction, onUpdate: NoAction, map: "client_ibfk_1")
+  invoice_client            invoice[]
 
-  @@index([company_id], map: "company_id")
+  @@index([company_id_client], map: "company_id_client")
 }
 
 model company {
-  id                     String     @id @default(uuid())
-  name                   String
-  address_line1          String
-  address_line2          String?
-  postal_code            String
-  city                   String
-  creation_date          DateTime?  @default(now()) @db.DateTime(0)
-  tax_identifier         String?
-  capital                Float?
-  number_of_employees    Int
-  responsible_first_name String
-  responsible_last_name  String
-  phone_number           String
-  email                  String     @unique(map: "email")
-  client                 client[]
-  invoice                invoice[]
-  product                product[]
-  stock                  stock[]
-  supplier               supplier[]
-  user                   user[]
+  id_company                  String     @id @default(uuid())
+  name_company                String
+  address_line1_company       String
+  address_line2_company       String?
+  postal_code_company         String
+  city_company                String
+  creation_date_company       DateTime   @default(now())
+  tax_identifier_company      String?
+  capital_company             Float
+  number_of_employees_company Int
+  responsible_name_company    String
+  phone_number_company        String
+  email_company               String     @unique(map: "email_company")
+  client_company              client[]
+  invoice_company             invoice[]
+  product_company             product[]
+  supplier_company            supplier[]
 }
 
 model invoice {
-  id           String         @id @default(uuid())
-  created_at   DateTime?      @default(now()) @db.DateTime(0)
-  due_date     DateTime?      @db.DateTime(0)
-  amount       Float?
-  is_paid      Boolean?
-  notes        String?
-  company_id   String?
-  client_id    String?
-  product_id   String?
-  company      company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_1")
-  client       client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_2")
-  product      product?       @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_3")
-  invoice_item invoice_item[]
+  id_invoice           String         @id @default(uuid())
+  created_at_invoice   DateTime       @default(now())
+  due_date_invoice     DateTime       @default(now())
+  amount_invoice       Float
+  company_id_invoice   String
+  client_id_invoice    String
+  company_invoice      company        @relation(fields: [company_id_invoice], references: [id_company], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_1")
+  client_invoice       client         @relation(fields: [client_id_invoice], references: [id_client], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_2")
+  invoice_item_invoice invoice_item[]
 
-  @@index([client_id], map: "client_id")
-  @@index([company_id], map: "company_id")
-  @@index([product_id], map: "product_id")
+  @@index([client_id_invoice], map: "client_id_invoice")
+  @@index([company_id_invoice], map: "company_id_invoice")
 }
 
 model invoice_item {
-  id          String   @id @default(uuid())
-  description String?
-  quantity    Int?
-  unit_price  Float?
-  invoice_id  String?
-  product_id  String?
-  invoice     invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_1")
-  product     product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_2")
+  id_invoice_item         String  @id @default(uuid())
+  invoice_id_invoice_item String
+  product_id_invoice_item String
+  invoice_item_invoice    invoice @relation(fields: [invoice_id_invoice_item], references: [id_invoice], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_1")
+  product_item_invoice    product @relation(fields: [product_id_invoice_item], references: [id_product], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_2")
 
-  @@index([invoice_id], map: "invoice_id")
-  @@index([product_id], map: "product_id")
+  @@index([invoice_id_invoice_item], map: "invoice_id_invoice_item")
+  @@index([product_id_invoice_item], map: "product_id_invoice_item")
 }
 
 model product {
-  id             String         @id @default(uuid())
-  name           String?
-  purchase_price Float?
-  sale_price     Float?
-  margin_rate    Float?
-  dimensions     String?
-  size           String?
-  description    String?
-  company_id     String?
-  supplier_id    String?
-  invoice        invoice[]
-  invoice_item   invoice_item[]
-  company        company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_1")
-  supplier       supplier?      @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_2")
-  stock          stock[]
+  id_product             String         @id @default(uuid())
+  name_product           String         @unique
+  purchase_price_product Float
+  sale_price_product     Float
+  company_id_product     String
+  supplier_id_product    String
+  invoice_item_product   invoice_item[]
+  company_product        company?       @relation(fields: [company_id_product], references: [id_company], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_1")
+  supplier_product       supplier?      @relation(fields: [supplier_id_product], references: [id_supplier], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_2")
 
-  @@index([company_id], map: "company_id")
-  @@index([supplier_id], map: "supplier_id")
-}
-
-model stock {
-  id         String   @id @default(uuid())
-  quantity   Int?
-  product_id String?
-  company_id String?
-  product    product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_1")
-  company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_2")
-
-  @@index([company_id], map: "company_id")
-  @@index([product_id], map: "product_id")
+  @@index([company_id_product], map: "company_id_product")
+  @@index([supplier_id_product], map: "supplier_id_product")
 }
 
 model supplier {
-  id            String    @id @default(uuid())
-  first_name    String?
-  last_name     String?
-  address_line1 String?
-  address_line2 String?
-  postal_code   String?
-  city          String?
-  phone_number  String?
-  email         String?
-  company_id    String?
-  product       product[]
-  company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "supplier_ibfk_1")
+  id_supplier                String    @id @default(uuid())
+  supplier_fullNmae_supplier String
+  address_line1_supplier     String
+  address_line2_supplier     String?
+  postal_code_supplier       String
+  city_supplier              String
+  phone_number_supplier      String
+  email_supplier             String    @unique
+  company_id_supplier        String?
+  product_supplier           product[]
+  company_supplier           company?  @relation(fields: [company_id_supplier], references: [id_company], onDelete: NoAction, onUpdate: NoAction, map: "supplier_ibfk_1")
 
-  @@index([company_id], map: "company_id")
-}
-
-model user {
-  id         String   @id @default(uuid())
-  first_name String
-  last_name  String
-  username   String   @unique(map: "username")
-  password   String
-  email      String   @unique(map: "email")
-  role       String
-  company_id String?
-  company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
-
-  @@index([company_id], map: "company_id")
+  @@index([company_id_supplier], map: "company_id_supplier")
 }
