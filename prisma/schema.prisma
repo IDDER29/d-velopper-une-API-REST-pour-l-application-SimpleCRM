@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id            String    @id @default(uuid())
+  first_name    String
+  last_name     String
+  address_line1 String
+  address_line2 String?
+  postal_code   String
+  city          String
+  phone_number  String
+  email         String
+  company_id    String
+  company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "client_ibfk_1")
+  invoice       invoice[]
+
+  @@index([company_id], map: "company_id")
+}
+
+model company {
+  id                     String     @id @default(uuid())
+  name                   String
+  address_line1          String
+  address_line2          String?
+  postal_code            String
+  city                   String
+  creation_date          DateTime?  @default(now()) @db.DateTime(0)
+  tax_identifier         String?
+  capital                Float?
+  number_of_employees    Int
+  responsible_first_name String
+  responsible_last_name  String
+  phone_number           String
+  email                  String     @unique(map: "email")
+  client                 client[]
+  invoice                invoice[]
+  product                product[]
+  stock                  stock[]
+  supplier               supplier[]
+  user                   user[]
+}
+
+model invoice {
+  id           String         @id @default(uuid())
+  created_at   DateTime?      @default(now()) @db.DateTime(0)
+  due_date     DateTime?      @db.DateTime(0)
+  amount       Float?
+  is_paid      Boolean?
+  notes        String?
+  company_id   String?
+  client_id    String?
+  product_id   String?
+  company      company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_1")
+  client       client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_2")
+  product      product?       @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_ibfk_3")
+  invoice_item invoice_item[]
+
+  @@index([client_id], map: "client_id")
+  @@index([company_id], map: "company_id")
+  @@index([product_id], map: "product_id")
+}
+
+model invoice_item {
+  id          String   @id @default(uuid())
+  description String?
+  quantity    Int?
+  unit_price  Float?
+  invoice_id  String?
+  product_id  String?
+  invoice     invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_1")
+  product     product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_item_ibfk_2")
+
+  @@index([invoice_id], map: "invoice_id")
+  @@index([product_id], map: "product_id")
+}
+
+model product {
+  id             String         @id @default(uuid())
+  name           String?
+  purchase_price Float?
+  sale_price     Float?
+  margin_rate    Float?
+  dimensions     String?
+  size           String?
+  description    String?
+  company_id     String?
+  supplier_id    String?
+  invoice        invoice[]
+  invoice_item   invoice_item[]
+  company        company?       @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_1")
+  supplier       supplier?      @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_ibfk_2")
+  stock          stock[]
+
+  @@index([company_id], map: "company_id")
+  @@index([supplier_id], map: "supplier_id")
+}
+
+model stock {
+  id         String   @id @default(uuid())
+  quantity   Int?
+  product_id String?
+  company_id String?
+  product    product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_1")
+  company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_ibfk_2")
+
+  @@index([company_id], map: "company_id")
+  @@index([product_id], map: "product_id")
+}
+
+model supplier {
+  id            String    @id @default(uuid())
+  first_name    String?
+  last_name     String?
+  address_line1 String?
+  address_line2 String?
+  postal_code   String?
+  city          String?
+  phone_number  String?
+  email         String?
+  company_id    String?
+  product       product[]
+  company       company?  @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "supplier_ibfk_1")
+
+  @@index([company_id], map: "company_id")
+}
+
+model user {
+  id         String   @id @default(uuid())
+  first_name String
+  last_name  String
+  username   String   @unique(map: "username")
+  password   String
+  email      String   @unique(map: "email")
+  role       String
+  company_id String?
+  company    company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
+
+  @@index([company_id], map: "company_id")
+}
