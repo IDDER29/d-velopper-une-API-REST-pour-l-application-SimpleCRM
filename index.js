@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { log } from "console";
 const prisma = new PrismaClient();
 
 import express from "express";
@@ -79,7 +80,7 @@ async function main() {
     }
   });
 
-  app.put("/users/userNmae/:userName", async (req, res) => {
+  app.put("/users/edit/userNmae/:userName", async (req, res) => {
     const { userName } = req.params;
     const { first_name, last_name, password, role } = req.body;
 
@@ -97,8 +98,23 @@ async function main() {
     }
   });
 
-  app.delete("/", function (req, res) {
-    res.send("Hello World");
+  app.delete("/users/delete/userName/:userName", async (req, res) => {
+    const { userName } = req.params; // changed id to userName
+
+    try {
+      const deletedUser = await prisma.user.delete({
+        where: { username: userName }, // changed id to username
+      });
+
+      res.json(deletedUser);
+      console.log("Deletion successful");
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the user" });
+    }
   });
 }
 
