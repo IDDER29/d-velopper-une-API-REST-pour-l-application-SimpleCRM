@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { log } from "console";
 const prisma = new PrismaClient();
 
+// import { afficherClientById, afficherClients, ajouterClient,modifierClient,supprimerClient } from "./Controllers/ClientController";
+
 import express from "express";
-
 const app = express();
-
 app.use(express.json());
 
 async function main() {
@@ -25,6 +24,39 @@ async function main() {
     });
     console.log(user);
     */
+  });
+
+  app.get("/create/companie", async (req, res) => {
+    const createCompanies = await prisma.company.create({
+      data: {
+        name: `Company  2`,
+        address_line1: `Address Line 2`,
+        city: `City 2`,
+        capital: parseInt((1).toString().repeat(6)),
+        number_of_employees: 50 + 2,
+        responsible_first_name: `Responsible  2`,
+        responsible_last_name: `Name 2`,
+        phone_number: `555-${("0" + 2).slice(-2)}${"5678".repeat(2)}`,
+        email: `company${2}@example.com`,
+        postal_code: "80000",
+      },
+    });
+    console.log(createCompanies);
+  });
+
+  app.get("/companies", async (req, res) => {
+    try {
+      const companys = await prisma.company.findMany();
+      res.status(200).json({
+        companys: companys,
+      });
+
+      console.log("nice bro ");
+    } catch (error) {
+      console.log("not nice bruhh");
+      console.error(error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
   });
   app.get("/users", async (req, res) => {
     try {
