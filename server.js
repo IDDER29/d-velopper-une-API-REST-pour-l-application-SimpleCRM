@@ -29,6 +29,14 @@ import {
   updateSupplier,
   deleteSupplier,
 } from "./Controllers/supplierController.js";
+import {
+  getAllProducts,
+  getProductById,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "./Controllers/ProduitController.js";
+
 import { format } from "path";
 const app = express();
 app.use(express.json());
@@ -279,6 +287,7 @@ async function main() {
   });
 
   ///////////////////////////////////////////////
+
   app.get("/show/suppliers", (req, res) => {
     try {
       getAllSuppliers().then((suppliers) => {
@@ -359,6 +368,91 @@ async function main() {
       res
         .status(500)
         .json({ error: "An error occurred while deleting the supplier" });
+    }
+  });
+
+  ////////////////////////////////////////////////////////////
+
+  app.get("/show/invoices", (req, res) => {
+    try {
+      getAllInvoices().then((invoices) => {
+        res.status(200).json({ invoices });
+        console.log("showing invoices");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the invoice" });
+    }
+  });
+
+  // get a uniqe invoice using the id
+  app.get("/show/invoice/:id", (req, res) => {
+    try {
+      getInvoiceById(req.params.id).then((invoice) => {
+        res.status(200).json({ invoice });
+        console.log("showing invoice");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the invoice" });
+    }
+  });
+
+  // POST
+
+  // create a new invoice
+  app.post("/create/invoice", async (req, res) => {
+    try {
+      addInvoice(req.body).then((newInvoice) => {
+        res.status(200).json({ newInvoice });
+        console.log("Creating new invoice");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the invoice" });
+    }
+  });
+
+  // PUT
+
+  // update a invoice
+  app.put("/update/invoice/:id", async (req, res) => {
+    try {
+      updateInvoice(req.params.id, req.body).then((updatedInvoice) => {
+        res.status(200).json({ updatedInvoice });
+        console.log("Updating invoice");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the invoice" });
+    }
+  });
+
+  // DELETE
+  app.delete("/delete/invoice/:id", async (req, res) => {
+    try {
+      deleteInvoice(req.params.id).then((deletedInvoice) => {
+        res.status(200).json({ deletedInvoice });
+        console.log("Invoice is deleted");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the invoice" });
     }
   });
 }
