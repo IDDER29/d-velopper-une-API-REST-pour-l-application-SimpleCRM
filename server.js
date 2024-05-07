@@ -15,6 +15,21 @@ import {
   updateCompany,
   deleteCompany,
 } from "./Controllers/company-controller.js";
+import {
+  getAllInvoices,
+  getInvoiceById,
+  addInvoice,
+  updateInvoice,
+  deleteInvoice,
+} from "./Controllers/FactureController.js";
+import {
+  getAllSuppliers,
+  getSupplierById,
+  addSupplier,
+  updateSupplier,
+  deleteSupplier,
+} from "./Controllers/supplierController.js";
+import { format } from "path";
 const app = express();
 app.use(express.json());
 
@@ -173,6 +188,177 @@ async function main() {
       res
         .status(500)
         .json({ error: "An error occurred while deleting the user" });
+    }
+  });
+
+  ////////////////////////////////777
+
+  app.get("/show/products", (req, res) => {
+    try {
+      getAllProducts().then((products) => {
+        res.status(200).json({ products });
+        console.log("showing products");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the product" });
+    }
+  });
+
+  // get a uniqe product using the id
+  app.get("/show/product/:id", (req, res) => {
+    try {
+      getProductById(req.params.id).then((product) => {
+        res.status(200).json({ product });
+        console.log("showing product");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the product" });
+    }
+  });
+
+  // POST
+
+  //   create a new product
+
+  app.post("/create/product", async (req, res) => {
+    try {
+      addProduct(req.body).then((newProduct) => {
+        res.status(200).json({ newProduct });
+        console.log("Creating new product");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the product" });
+    }
+  });
+
+  //PUT
+
+  // update a product
+
+  app.put("/update/product/:id", async (req, res) => {
+    try {
+      updateProduct(req.params.id, req.body).then((updatedProduct) => {
+        res.status(200).json({ updatedProduct });
+        console.log("Updating product");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the product" });
+    }
+  });
+
+  //DELETE
+  app.delete("/delete/product/:id", async (req, res) => {
+    try {
+      deleteProduct(req.params.id).then((deletedProduct) => {
+        res.status(200).json({ deletedProduct });
+        console.log("Product is deleted");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the product" });
+    }
+  });
+
+  ///////////////////////////////////////////////
+  app.get("/show/suppliers", (req, res) => {
+    try {
+      getAllSuppliers().then((suppliers) => {
+        res.status(200).json({ suppliers });
+        console.log("showing suppliers");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the supplier" });
+    }
+  });
+
+  // get a uniqe supplier using the id
+  app.get("/show/supplier/:id", (req, res) => {
+    try {
+      getSupplierById(req.params.id).then((supplier) => {
+        res.status(200).json({ supplier });
+        console.log("showing supplier");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the supplier" });
+    }
+  });
+
+  // POST
+
+  // create a new supplier
+  app.post("/create/supplier", async (req, res) => {
+    try {
+      addSupplier(req.body).then((newSupplier) => {
+        res.status(200).json({ newSupplier });
+        console.log("Creating new supplier");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the supplier" });
+    }
+  });
+
+  // PUT
+
+  // update a supplier
+  app.put("/update/supplier/:id", async (req, res) => {
+    try {
+      updateSupplier(req.params.id, req.body).then((updatedSupplier) => {
+        res.status(200).json({ updatedSupplier });
+        console.log("Updating supplier");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the supplier" });
+    }
+  });
+
+  // DELETE
+  app.delete("/delete/supplier/:id", async (req, res) => {
+    try {
+      deleteSupplier(req.params.id).then((deletedSupplier) => {
+        res.status(200).json({ deletedSupplier });
+        console.log("Supplier is deleted");
+      });
+    } catch (error) {
+      console.log("Deletion failed");
+      console.error(error.message);
+      res
+        .status(500)
+        .json({ error: "An error occurred while deleting the supplier" });
     }
   });
 }
